@@ -5,10 +5,11 @@
 #----------------------------------
 
 USER_BRANCH=hackathon
+REGISTRY=ghcr.io 
 
 #==================================
 
-set -e
+#set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PARENT_DIR=$(dirname "$(readlink -f "$SCRIPT_DIR")")
@@ -164,7 +165,9 @@ start_time=$(date +%s)
 #====================================
 
 github_user_name="bfh-cell"
+git_user_name=$(whoami)
 git_user_email="acroba-cell.ti@bfh.ch"
+
 
 if [[ "$pat" = "true" ]]; then 
 
@@ -180,7 +183,7 @@ if [[ "$pat" = "true" ]]; then
     echo "checking '$RESOURCES_DIR/pat.gpg'"
     if [ -e "$RESOURCES_DIR/pat.gpg" ]; then 
         echo "pat found"
-        gpg -d "$RESOURCES_DIR/pat.gpg" -o "$RESOURCES_DIR/pat
+        gpg -o "$RESOURCES_DIR/pat" -d "$RESOURCES_DIR/pat.gpg"
         read -r PAT < "$RESOURCES_DIR/pat" || echo "$PAT"
         echo "saving git credentials"
         git ls-remote https://${github_user_name}:$PAT@$(git remote get-url origin | sed 's|https://||') > /dev/null
@@ -194,7 +197,7 @@ if [[ "$pat" = "true" ]]; then
         check_docker
         echo "using docker registry @ '$REGISTRY'"
         docker login $REGISTRY -u $github_user_name --password-stdin <<< "$PAT"
-        rm "$RESOURCES_DIR/pat
+        rm "$RESOURCES_DIR/pat"
     else
          echo "!!! could not find the PAT file, skipping git access setup."   
     fi
@@ -216,14 +219,18 @@ if [[ "$git" = "true" ]]; then
 
     echo "Checking out Platform"
     if ! [ -d "$CHECKOUT_DIR/platform" ]; then 
-        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com:acroba-hackathon/platform.git
+        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/acroba-hackathon/platform.git
 
         echo "setting up git config locally"
         git -C $CHECKOUT_DIR/platform config --local user.name $git_user_name
         git -C $CHECKOUT_DIR/platform config --local user.email $git_user_email
+        git -C $CHECKOUT_DIR/platform checkout master
+        make -C $CHECKOUT_DIR/platform checkout
         git -C $CHECKOUT_DIR/platform checkout -b hack-$git_user_name
         git -C $CHECKOUT_DIR/platform/acroba-modules/skills checkout -b hack-$git_user_name
         git -C $CHECKOUT_DIR/platform/acroba-modules/taskplanner checkout -b hack-$git_user_name
+        git -C $CHECKOUT_DIR/platform/ add acroba-modules/skills
+        git -C $CHECKOUT_DIR/platform/ add acroba-modules/taskplanner
         git -C $CHECKOUT_DIR/platform/ commit -m "skills & tp branch update"
     else
         echo "directory $CHECKOUT_DIR/platform already exists, skipping."
@@ -232,9 +239,10 @@ if [[ "$git" = "true" ]]; then
     
     echo "Checking out cell_config"
     if ! [ -d "$CHECKOUT_DIR/cell-hackathon" ]; then 
-        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com:acroba-hackathon/cell-hackathon.git
+        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/acroba-hackathon/cell-hackathon.git
         git -C $CHECKOUT_DIR/cell-hackathon config --local user.name $git_user_name
         git -C $CHECKOUT_DIR/cell-hackathon config --local user.email $git_user_email
+        git -C $CHECKOUT_DIR/cell-hackathon checkout
         git -C $CHECKOUT_DIR/cell-hackathon checkout -b hack-$git_user_name
     else 
         echo "directory $CHECKOUT_DIR/cell-hackathon already exists, skipping."
@@ -262,16 +270,11 @@ if [[ "$cleanimages" = "true" ]]; then
 fi 
 
 if [[ "$download" = "true" ]]; then 
-    check_docker
-    if [[ "$use_platform" = "true" ]]; then 
-        echo "Downloading the platform docker images"
-        (cd "$CHECKOUT_DIR/platform/" && make pull TAG=latest)
-    else
-        echo "skipping platform docker images download"
-    fi
+    echo "Downloading the platform docker images"
+    make -C "$CHECKOUT_DIR/platform/" pull TAG=latest
 
     echo "Downloading the cell-hackathon image"
-    (cd "$CHECKOUT_DIR/cell-hackathon/" && make pull TAG=latest)
+    make -C "$CHECKOUT_DIR/cell-hackathon/" pull TAG=latest
 fi 
 
 #==================================
