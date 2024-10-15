@@ -17,16 +17,17 @@ RESOURCES_DIR=$SCRIPT_DIR/resources
 CHECKOUT_DIR=$SCRIPT_DIR/code
 
 #==================================
-# 0. Parsing which setup to run
+# Parsing which setup to run
 #==================================
 
-LONG_OPTIONS=git,pat,download,skip,clean,clean-code,clean-images
-OPTIONS=gpnvcoi
+LONG_OPTIONS=git,pat,dev,download,skip,clean,clean-code,clean-images
+OPTIONS=gpvdscoi
 
 #--------------------------------------------------
 # default arguments 
 _git=true
 _pat=true
+_dev=true
 _download=true 
 _cleancode=false
 _cleanimages=false
@@ -45,7 +46,7 @@ skip=false
 
 # skippable steps (with --skip arg)
 git=false
-pat=false 
+pat=false
 download=false
 dev=false 
 
@@ -63,6 +64,11 @@ while true; do
             ;;
         -p|--pat)
             pat=true
+            has_args=true
+            shift
+            ;;
+        -v|--dev)
+            dev=true
             has_args=true
             shift
             ;;
@@ -123,6 +129,9 @@ fi
 if [[ "$git" = "true" ]]; then
     echo "- Git checkout (directory $CHECKOUT_DIR)"
 fi
+if [[ "$dev" = "true" ]]; then
+    echo "- platform requirement installation"
+fi
 if [[ "$cleanimages" = "true" ]]; then
     echo "- delete unused docker images"
 fi 
@@ -151,7 +160,7 @@ start_time=$(date +%s)
 
 
 #====================================
-# 2. GIT PERSONAL ACCESS TOKEN SETUP
+# GIT PERSONAL ACCESS TOKEN SETUP
 #====================================
 
 github_user_name="bfh-cell"
@@ -232,6 +241,14 @@ if [[ "$git" = "true" ]]; then
     fi
 fi
 
+#==================================
+# Running setup script
+#==================================
+
+if [[  "$dev" = "true" ]]; then
+    echo "installing platform requirements"
+    $CHECKOUT_DIR/platform/setup.sh --dck --dev
+fi
 
 #==================================
 # 5. DOWNLOADING DOCKER IMAGES
