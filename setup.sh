@@ -273,8 +273,8 @@ if [[ "$download" = "true" ]]; then
     echo "Downloading the platform docker images"
     make -C "$CHECKOUT_DIR/platform/" pull TAG=latest
 
-    echo "Downloading the cell-hackathon image"
-    make -C "$CHECKOUT_DIR/cell-hackathon/" pull TAG=latest
+    echo "Downloading the cell-bfh image"
+    make -C "$CHECKOUT_DIR/cell-bhf/" pull TAG=latest
 fi 
 
 #==================================
