@@ -4,7 +4,7 @@
 # SETUP 
 #----------------------------------
 
-USER_BRANCH=hackathon
+USER_BRANCH=bfh
 REGISTRY=ghcr.io 
 
 #==================================
@@ -226,26 +226,26 @@ if [[ "$git" = "true" ]]; then
         git -C $CHECKOUT_DIR/platform config --local user.email $git_user_email
         git -C $CHECKOUT_DIR/platform checkout master
         make -C $CHECKOUT_DIR/platform checkout
-        git -C $CHECKOUT_DIR/platform checkout -b hack-$git_user_name
-        git -C $CHECKOUT_DIR/platform/acroba-modules/skills checkout -b hack-$git_user_name
-        git -C $CHECKOUT_DIR/platform/acroba-modules/taskplanner checkout -b hack-$git_user_name
-        git -C $CHECKOUT_DIR/platform/ add acroba-modules/skills
-        git -C $CHECKOUT_DIR/platform/ add acroba-modules/taskplanner
-        git -C $CHECKOUT_DIR/platform/ commit -m "skills & tp branch update"
+        # git -C $CHECKOUT_DIR/platform checkout -b ${USER_BRANCH}-$git_user_name
+        # git -C $CHECKOUT_DIR/platform/acroba-modules/skills checkout -b hack-$git_user_name
+        # git -C $CHECKOUT_DIR/platform/acroba-modules/taskplanner checkout -b hack-$git_user_name
+        # git -C $CHECKOUT_DIR/platform/ add acroba-modules/skills
+        # git -C $CHECKOUT_DIR/platform/ add acroba-modules/taskplanner
+        # git -C $CHECKOUT_DIR/platform/ commit -m "skills & tp branch update"
     else
         echo "directory $CHECKOUT_DIR/platform already exists, skipping."
     fi 
 
     
     echo "Checking out cell_config"
-    if ! [ -d "$CHECKOUT_DIR/cell-hackathon" ]; then 
-        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/acroba-hackathon/cell-hackathon.git
-        git -C $CHECKOUT_DIR/cell-hackathon config --local user.name $git_user_name
-        git -C $CHECKOUT_DIR/cell-hackathon config --local user.email $git_user_email
-        git -C $CHECKOUT_DIR/cell-hackathon checkout
-        git -C $CHECKOUT_DIR/cell-hackathon checkout -b hack-$git_user_name
+    if ! [ -d "$CHECKOUT_DIR/cell-bfh" ]; then 
+        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/ACROBA-Project/cell_config_bfh.git
+        git -C $CHECKOUT_DIR/cell-bfh config --local user.name $git_user_name
+        git -C $CHECKOUT_DIR/cell-bfh config --local user.email $git_user_email
+        git -C $CHECKOUT_DIR/cell-bfh checkout
+        git -C $CHECKOUT_DIR/cell-bfh checkout -b $USER_BRANCH-$git_user_name
     else 
-        echo "directory $CHECKOUT_DIR/cell-hackathon already exists, skipping."
+        echo "directory $CHECKOUT_DIR/cell-bfh already exists, skipping."
     fi
 fi
 
