@@ -275,6 +275,7 @@ if [[ "$download" = "true" ]]; then
 
     echo "Downloading the cell-bfh image"
     make -C "$CHECKOUT_DIR/cell-bhf/" pull TAG=latest
+    docker tag acroba/cell-config-bfh acroba-hackathon/cell-config-bfh
 fi 
 
 #==================================
