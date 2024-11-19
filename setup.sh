@@ -239,7 +239,7 @@ if [[ "$git" = "true" ]]; then
     
     echo "Checking out cell_config"
     if ! [ -d "$CHECKOUT_DIR/cell-bfh" ]; then 
-        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/ACROBA-Project/cell_config_bfh.git
+        git -C $CHECKOUT_DIR clone https://${github_user_name}@github.com/ACROBA-Project/cell_config_bfh.git cell-bfh
         git -C $CHECKOUT_DIR/cell-bfh config --local user.name $git_user_name
         git -C $CHECKOUT_DIR/cell-bfh config --local user.email $git_user_email
         git -C $CHECKOUT_DIR/cell-bfh checkout
@@ -274,7 +274,7 @@ if [[ "$download" = "true" ]]; then
     make -C "$CHECKOUT_DIR/platform/" pull TAG=latest
 
     echo "Downloading the cell-bfh image"
-    make -C "$CHECKOUT_DIR/cell-bhf/" pull TAG=latest
+    make -C "$CHECKOUT_DIR/cell-bfh/" pull TAG=latest
     docker tag acroba/cell-config-bfh acroba-hackathon/cell-config-bfh
 fi 
 
